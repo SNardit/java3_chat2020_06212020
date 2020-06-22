@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.sql.SQLException;
 
 public class ClientHandler {
 
@@ -104,9 +105,13 @@ public class ClientHandler {
             }
             switch (command.getType()) {
                 case AUTH: {
-                    if (processAuthCommand(command)) {
-                        closeConnection.interrupt();
-                        return;
+                    try {
+                        if (processAuthCommand(command)) {
+                            closeConnection.interrupt();
+                            return;
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
                     }
                     break;
                 }
@@ -135,7 +140,7 @@ public class ClientHandler {
         return closeConnection;
     }
 
-    private boolean processAuthCommand(Command command) throws IOException {
+    private boolean processAuthCommand(Command command) throws IOException, SQLException {
         AuthCommand authCommand = (AuthCommand) command.getData();
         String login = authCommand.getLogin();
         String password = authCommand.getPassword();

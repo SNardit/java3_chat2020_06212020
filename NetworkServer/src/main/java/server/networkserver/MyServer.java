@@ -26,7 +26,7 @@ public class MyServer {
     public void start () {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Server is running");
-            authService.start();
+            //authService.start();
             //noinspection InfiniteLoopStatement
             while (true) {
                 System.out.println("Server is waiting connection....");

@@ -10,7 +10,9 @@ public class ClientChat {
 
     public static JPanel mainPanel;
     public static JButton sendButton;
+    public static JButton changeNickButton;
     public static JTextField entryField;
+    public static JTextField newNickname;
     public static JList <String> usersList;
     public static JTextArea chatMessages;
 
@@ -26,7 +28,16 @@ public class ClientChat {
             usersPane.setPreferredSize(new Dimension(150, getHeight()));
             mainPanel.add(usersPane, BorderLayout.WEST);
 
-            //String[] users = {"All", "nick1", "nick2", "nick3", "nick4", "nick5"};
+            JPanel changeNickPane = new JPanel(new BorderLayout());
+            changeNickPane.setPreferredSize(new Dimension(getWidth(), 55));
+            usersPane.add(changeNickPane, BorderLayout.NORTH);
+            newNickname = new JTextField();
+            changeNickPane.add(newNickname, BorderLayout.NORTH);
+            changeNickButton = new JButton("Change nick");
+            changeNickButton.setPreferredSize(new Dimension(100,10));
+            changeNickPane.add(changeNickButton);
+            changeNickPane.setBackground(BRIGHT_GREEN);
+
             usersList = new JList<>();
             usersPane.add(usersList, BorderLayout.CENTER);
             usersList.setPreferredSize(usersPane.getPreferredSize());
@@ -49,7 +60,7 @@ public class ClientChat {
             chatMessages.setWrapStyleWord(true);
             chatMessages.setBackground(LIGHT_PINK);
             chatMessages.setForeground(AQUAMARINE);
-            chatMessages.setText("Ваши предыдущие сообщения: \n");
+            chatMessages.setText("Your previous messages: \n");
             chatMessages.setEditable(false);
 
 
@@ -60,7 +71,7 @@ public class ClientChat {
 
             entryField = new JTextField();
             sendMessagePanel.add(entryField, BorderLayout.CENTER);
-            sendButton = new JButton("Отправить");
+            sendButton = new JButton("Send");
             sendMessagePanel.add(sendButton, BorderLayout.EAST);
 
         }

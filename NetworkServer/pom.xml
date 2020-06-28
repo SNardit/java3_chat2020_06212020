@@ -19,5 +19,25 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <finalName>ChatServer</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>NetworkServer.Start</mainClass>
+                            <dependenciesClass>NetworkClientServer.Start</dependenciesClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

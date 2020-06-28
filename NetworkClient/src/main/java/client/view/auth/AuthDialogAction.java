@@ -22,11 +22,13 @@ public class AuthDialogAction extends MyWindowAuth {
         this.controller = controller;
         setTitle("Authentication");
         setContentPane(contentPanel);
-        getRootPane().setDefaultButton(ok);
+        //getRootPane().setDefaultButton(signIn);
         setBounds(WINDOW_START_X, WINDOW_START_Y, WINDOW_SIZE_X, WINDOW_SIZE_Y);
         setResizable(false);
 
-        ok.addActionListener(e -> onOK());
+        signIn.addActionListener(e -> onSignIn());
+
+        signUp.addActionListener(e -> onSignUp());
 
         exit.addActionListener(e -> onCancel());
 
@@ -38,10 +40,18 @@ public class AuthDialogAction extends MyWindowAuth {
         });
     }
 
-    private void onOK() {
+    private void onSignIn() {
         String login = entryLogin.getText().trim();
         String pass = new String(entryPass.getPassword()).trim();
         controller.sendAuthMessage(login, pass);
+    }
+
+    private void onSignUp() {
+        String login = entryLogin.getText().trim();
+        String pass = new String(entryPass.getPassword()).trim();
+        controller.sendSignUpMessage(login, pass);
+       /* entryLogin.setText(null);
+        entryPass.setText(null);*/
     }
 
     private void onCancel() {

@@ -1,10 +1,7 @@
 package client.model;
 
 import client.Command;
-import client.command.AuthCommand;
-import client.command.ErrorCommand;
-import client.command.MessageCommand;
-import client.command.UpdateUsersListCommand;
+import client.command.*;
 import client.controller.AuthEvent;
 import client.controller.ClientController;
 
@@ -62,6 +59,10 @@ public class NetworkService {
 
     private void processCommand(Command command) {
         switch (command.getType()) {
+            /*case SIGN_UP: {
+                processSingUp(command);
+                break;
+            }*/
             case AUTH: {
                 processAuthCommand(command);
                 break;
@@ -75,6 +76,10 @@ public class NetworkService {
                 processErrorCommand(command);
                 break;
             }
+            case CHANGE_NICKNAME: {
+                processChangeNicknameCommand(command);
+                break;
+            }
             case UPDATE_USERS_LIST: {
                 updateUsersListCommand(command);
                 break;
@@ -82,6 +87,13 @@ public class NetworkService {
             default:
                 System.err.println("Unknown type of command " + command.getType());
         }
+    }
+
+
+    private void processChangeNicknameCommand(Command command) {
+        ChangeNicknameCommand data = (ChangeNicknameCommand) command.getData();
+        String newNickname = data.getNewNickname();
+        controller.changeNickname(newNickname);
     }
 
     private void updateUsersListCommand(Command command) {

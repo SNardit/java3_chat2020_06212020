@@ -32,6 +32,13 @@ public class Command implements Serializable {
         return command;
     }
 
+    public static Command signUpCommand (String login, String password) {
+        Command command = new Command();
+        command.type = CommandType.SIGN_UP;
+        command.data = new SignUpCommand(login, password);
+        return command;
+    }
+
     public static Command errorCommand (String errorMessage) {
         Command command = new Command();
         command.type = CommandType.ERROR;
@@ -57,6 +64,13 @@ public class Command implements Serializable {
         Command command = new Command();
         command.type = CommandType.BROADCAST_MESSAGE;
         command.data = new BroadcastMessageCommand(message);
+        return command;
+    }
+
+    public static Command changeNickname (String newNickname) {
+        Command command = new Command();
+        command.type = CommandType.CHANGE_NICKNAME;
+        command.data = new ChangeNicknameCommand(newNickname);
         return command;
     }
 

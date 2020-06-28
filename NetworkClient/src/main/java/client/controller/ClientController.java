@@ -99,7 +99,7 @@ public class ClientController {
     }
 
     public void updateUsersList(List<String> users) {
-        users.remove(nickname);
+        //users.remove(nickname);
         users.add(0, ALL_USERS_LIST_ITEM);
         clientChatAction.updateUsers(users);
     }
@@ -107,5 +107,13 @@ public class ClientController {
     public void closeAllWindows() {
         authDialogAction.dispose();
         clientChatAction.dispose();
+    }
+
+    public void changeNickname(String newNickname) {
+        sendCommand(Command.changeNickname(newNickname));
+    }
+
+    public void sendSignUpMessage(String login, String pass) {
+        sendCommand(Command.signUpCommand(login, pass));
     }
 }

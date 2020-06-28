@@ -2,8 +2,9 @@ package server.networkserver;
 
 import client.Command;
 import server.networkserver.auth.AuthService;
-import server.networkserver.auth.BaseAuthService;
+import server.networkserver.auth.DBBaseAuthService;
 import server.networkserver.clienthandler.ClientHandler;
+import server.networkserver.sqlhandler.SQLHandler;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -20,13 +21,16 @@ public class MyServer {
     public MyServer(int port) {
         this.port = port;
         this.clients = new ArrayList<>();
-        this.authService = new BaseAuthService();
+        this.authService = new DBBaseAuthService();
     }
 
     public void start () {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Server is running");
-            authService.start();
+            if (!SQLHandler.connect()) {
+                throw new RuntimeException("Problems with connecting to the database");
+            }
+            //authService.start();
             //noinspection InfiniteLoopStatement
             while (true) {
                 System.out.println("Server is waiting connection....");
@@ -45,7 +49,7 @@ public class MyServer {
             System.err.println(e.getMessage());
             e.printStackTrace();
         } finally {
-            authService.stop();
+            SQLHandler.disconnect();
         }
     }
 
@@ -68,6 +72,7 @@ public class MyServer {
         }
     }
 
+
     public synchronized void privateMessage(String receiver, Command command) throws IOException {
         for (ClientHandler client : clients) {
             if (client.getNickname().equals(receiver)) {
@@ -76,6 +81,15 @@ public class MyServer {
             }
         }
     }
+
+    /*public void messagesHistory(String receiver, String messages){
+        for (ClientHandler client : clients) {
+            if (client.getNickname().equals(receiver)) {
+                client.sendMessage(messages);
+                return;
+            }
+        }
+    }*/
 
     public synchronized void subscribe(ClientHandler clientHandler) throws IOException {
         clients.add(clientHandler);
@@ -89,7 +103,7 @@ public class MyServer {
         broadcastMessage(Command.updateUsersListCommand(users));
     }
 
-    private List<String> getAllUsername() {
+    public List<String> getAllUsername() {
         /*return clients.stream()
                 .map(ClientHandler::getNickname)
                 .collect(Collectors.toList());*/
@@ -100,4 +114,6 @@ public class MyServer {
         }
         return result;
     }
+
+
 }

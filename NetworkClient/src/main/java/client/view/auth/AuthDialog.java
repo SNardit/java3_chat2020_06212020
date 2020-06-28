@@ -11,7 +11,8 @@ public class AuthDialog {
     public static final Color LIGHT_PINK = new Color(250, 230, 230);
 
     public static JPanel contentPanel;
-    public static JButton ok;
+    public static JButton signIn;
+    public static JButton signUp;
     public static JButton exit;
     public static JTextField entryLogin;
     public static JPasswordField entryPass;
@@ -54,8 +55,10 @@ public class AuthDialog {
             contentPanel.add(buttonPanel, BorderLayout.PAGE_END);
             buttonPanel.setBackground(LIGHT_GREEN);
 
-            ok = new JButton("Ok");
-            buttonPanel.add(ok, BorderLayout.WEST);
+            signIn = new JButton("Sign In");
+            buttonPanel.add(signIn, BorderLayout.WEST);
+            signUp = new JButton("Sign Up");
+            buttonPanel.add(signUp, BorderLayout.CENTER);
             exit = new JButton("Exit");
             buttonPanel.add(exit, BorderLayout.EAST);
 

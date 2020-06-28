@@ -1,15 +1,18 @@
 package server.networkserver.auth;
 
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 
-public class BaseAuthService implements AuthService {
+public class SimpleBaseAuthService implements AuthService {
 
     private static class AuthEntry {
         private String login;
         private String password;
+
+
 
         public AuthEntry(String login, String password) {
             this.login = login;
@@ -42,19 +45,20 @@ public class BaseAuthService implements AuthService {
 
     @Override
     public String getNickByLoginAndPassword(String login, String password) {
+
         fillMap();
         return NICK_BY_LOGIN_AND_PASSWORD.get(new AuthEntry (login, password));
     }
 
     @Override
-    public void start() {
-        System.out.println("Auth service has been started");
-
+    public boolean registration(String login, String password, String nickname) {
+        return false;
     }
 
     @Override
-    public void stop() {
-        System.out.println("Auth service has been stopped");
-
+    public boolean changeNickname(String oldNickname, String newNickname) {
+        return false;
     }
+
 }
+

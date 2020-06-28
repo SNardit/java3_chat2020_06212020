@@ -7,6 +7,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
 
+
 import static client.view.chat.ClientChat.*;
 
 public class ClientChatAction extends MyWindowChat {
@@ -38,6 +39,8 @@ public class ClientChatAction extends MyWindowChat {
     public void addListeners() {
         sendButton.addActionListener(e -> sendMessage());
         entryField.addActionListener(e -> sendMessage());
+        changeNickButton.addActionListener(e -> changeNickname());
+        newNickname.addActionListener(e -> changeNickname());
     }
 
     private void sendMessage() {
@@ -82,5 +85,11 @@ public class ClientChatAction extends MyWindowChat {
             }
             usersList.setModel(model);
         });
+    }
+    private void changeNickname() {
+        String newNick;
+        newNick = newNickname.getText().trim();
+        controller.changeNickname(newNick);
+        newNickname.setText(null);
     }
 }

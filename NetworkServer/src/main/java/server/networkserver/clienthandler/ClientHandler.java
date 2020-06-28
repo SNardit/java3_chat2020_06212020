@@ -8,7 +8,11 @@ import server.networkserver.sqlhandler.SQLHandler;
 
 import java.io.*;
 import java.net.Socket;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Scanner;
 
 public class ClientHandler {
 
@@ -18,8 +22,7 @@ public class ClientHandler {
 
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
-    /*private ObjectInputStream inputStream;
-    private ObjectOutputStream outputStream;*/
+
     private String nickname;
 
     public ClientHandler(Socket clientSocket, MyServer myServer) {
@@ -67,7 +70,7 @@ public class ClientHandler {
                     BroadcastMessageCommand data = (BroadcastMessageCommand) command.getData();
                     serverInstance.broadcastMessage(Command.messageCommand(nickname, data.getMessage()));
                     addMessageToDatabase("forAll", data.getMessage());
-                    //addMessageToLocalFile("forAll", data.getMessage());
+                    addMessageToLocalFile("All", data.getMessage());
                     break;
                 case PRIVATE_MESSAGE:
                     PrivateMessageCommand privateMessageCommand = (PrivateMessageCommand) command.getData();
@@ -75,6 +78,7 @@ public class ClientHandler {
                     String message = privateMessageCommand.getMessage();
                     serverInstance.privateMessage(receiver, Command.messageCommand(nickname, message));
                     addMessageToDatabase(receiver, message);
+                    addMessageToLocalFile(receiver, message);
                     break;
                 case CHANGE_NICKNAME:
                     ChangeNicknameCommand changeNicknameCommand = (ChangeNicknameCommand) command.getData();
@@ -89,22 +93,41 @@ public class ClientHandler {
         }
     }
 
-   /* private void addMessageToLocalFile(String receiver, String message) {
-        File file = new File("../NetworkClient/history/history_" + receiver +".txt");
+    private void addMessageToLocalFile(String receiver, String message) {
+        File fileSender = new File(("./NetworkClient/history/history_" + nickname + ".txt"));
+        ifFileExist(fileSender);
+        addToFile(fileSender, receiver, message);
+
+        File fileReceiver = new File(("./NetworkClient/history/history_" + receiver + ".txt"));
+        ifFileExist(fileReceiver);
+        addToFile(fileReceiver, receiver, message);
+
+    }
+
+
+    private void ifFileExist (File file) {
+        if (!file.exists()) {
             try {
-                if (!file.exists()) {
-                    file.createNewFile();
-                }
-               *//* try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(file, true)){
-                    osw.write
-                }*//*
-
-            } catch (IOException e) {
-                e.printStackTrace();
+                file.createNewFile();
+            } catch (IOException exc) {
+                exc.printStackTrace();
             }
+        }
+    }
 
+    private void addToFile (File file, String receiver, String message) {
+        //LocalDateTime date = LocalDateTime.now();
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+        Calendar cal = Calendar.getInstance();
+        String date = dateFormat.format(cal.getTime());
 
-    }*/
+        try (BufferedWriter bf = new BufferedWriter(new FileWriter(file, true));) {
+            bf.write("\n(" + date + ") " + nickname + " to " + receiver + ": " + message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private Command readCommand() throws IOException {
         try {

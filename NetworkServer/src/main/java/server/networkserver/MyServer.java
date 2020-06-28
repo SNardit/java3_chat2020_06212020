@@ -82,14 +82,6 @@ public class MyServer {
         }
     }
 
-    /*public void messagesHistory(String receiver, String messages){
-        for (ClientHandler client : clients) {
-            if (client.getNickname().equals(receiver)) {
-                client.sendMessage(messages);
-                return;
-            }
-        }
-    }*/
 
     public synchronized void subscribe(ClientHandler clientHandler) throws IOException {
         clients.add(clientHandler);

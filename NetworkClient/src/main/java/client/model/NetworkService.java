@@ -59,10 +59,6 @@ public class NetworkService {
 
     private void processCommand(Command command) {
         switch (command.getType()) {
-            /*case SIGN_UP: {
-                processSingUp(command);
-                break;
-            }*/
             case AUTH: {
                 processAuthCommand(command);
                 break;

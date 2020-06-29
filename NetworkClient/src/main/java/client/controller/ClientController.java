@@ -1,8 +1,10 @@
 package client.controller;
 
 import client.Command;
+import client.history.History;
 import client.model.NetworkService;
 import client.view.auth.AuthDialogAction;
+import client.view.chat.ClientChat;
 import client.view.chat.ClientChatAction;
 
 import javax.swing.*;
@@ -15,6 +17,7 @@ public class ClientController {
     private final AuthDialogAction authDialogAction;
     private final ClientChatAction clientChatAction;
     private String nickname;
+    private String login;
 
 
     public ClientController(String serverHost, int serverPort) {
@@ -40,6 +43,8 @@ public class ClientController {
         authDialogAction.dispose();
         networkService.setMessageHandler(clientChatAction::appendMessage);
         clientChatAction.setVisible(true);
+        ClientChat.chatMessages.append(History.getLast100LinesOfHistory(login));
+        History.start(login);
     }
 
     private void setUserName(String nickname) {
@@ -58,6 +63,7 @@ public class ClientController {
 
     public void sendAuthMessage(String login, String pass) {
         sendCommand(Command.authCommand(login, pass));
+        this.login = login;
     }
 
     public void sendMessage(String message) {

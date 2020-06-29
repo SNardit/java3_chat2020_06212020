@@ -11,17 +11,21 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MyServer {
 
     private int port;
     private List<ClientHandler> clients;
     private AuthService authService;
+    private  ExecutorService service;
 
     public MyServer(int port) {
         this.port = port;
         this.clients = new ArrayList<>();
         this.authService = new DBBaseAuthService();
+        this.service = Executors.newCachedThreadPool();
     }
 
     public void start () {
@@ -42,9 +46,9 @@ public class MyServer {
                 } catch (IOException e) {
                     System.err.println("Filed to handle client connection!");
                     clientSocket.close();
+                    service.shutdown();
                 }
             }
-
         } catch (IOException e) {
             System.err.println(e.getMessage());
             e.printStackTrace();
@@ -53,6 +57,9 @@ public class MyServer {
         }
     }
 
+    public void serviceExecute(Runnable task){
+        service.execute(task);
+    }
     public AuthService getAuthService() {
         return authService;
     }

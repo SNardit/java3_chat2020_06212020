@@ -54,16 +54,25 @@ public class SQLHandler {
         psAddMessage = connection.prepareStatement("INSERT INTO messages (sender, receiver, text, date) " +
                 "VALUES ((SELECT id FROM users WHERE nickname = ?), (SELECT id FROM users WHERE nickname = ?), ?, DATETIME('NOW'));");
 
-        psGetMessageForNick = connection.prepareStatement("SELECT * FROM ("
-                + "SELECT (SELECT nickname FROM users WHERE id = sender),\n" +
+        psGetMessageForNick = connection.prepareStatement("SELECT \n" +
+                "(SELECT nickname FROM users WHERE id = sender),\n" +
                 "(SELECT nickname FROM users WHERE id = receiver),\n" +
                 "text,\n" +
                 "date\n" +
                 "FROM messages\n" +
                 "WHERE sender = (SELECT id FROM users WHERE nickname = ?)\n " +
                 "OR receiver = (SELECT id FROM users WHERE nickname = ?)\n " +
-                "OR receiver = (SELECT id FROM users WHERE nickname = 'forAll') ORDER BY date DESC LIMIT 100)" +
-                "ORDER BY date;");
+                "OR receiver = (SELECT id FROM users WHERE nickname = 'forAll');");
+                         /*"SELECT * FROM ("
+                        + "SELECT (SELECT nickname FROM users WHERE id = sender),\n" +
+                        "(SELECT nickname FROM users WHERE id = receiver),\n" +
+                        "text,\n" +
+                        "date\n" +
+                        "FROM messages\n" +
+                        "WHERE sender = (SELECT id FROM users WHERE nickname = ?)\n " +
+                        "OR receiver = (SELECT id FROM users WHERE nickname = ?)\n " +
+                        "OR receiver = (SELECT id FROM users WHERE nickname = 'forAll') ORDER BY date DESC LIMIT 100)" +
+                        "ORDER BY date;");*/
 
     }
 

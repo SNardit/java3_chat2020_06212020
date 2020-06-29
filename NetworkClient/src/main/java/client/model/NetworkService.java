@@ -4,6 +4,7 @@ import client.Command;
 import client.command.*;
 import client.controller.AuthEvent;
 import client.controller.ClientController;
+import client.history.History;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -49,6 +50,7 @@ public class NetworkService {
                 } catch (IOException e) {
                     System.out.println("Поток чтения был прерван!");
                     controller.closeAllWindows();
+                    History.stop();
                     return;
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
@@ -61,6 +63,7 @@ public class NetworkService {
         switch (command.getType()) {
             case AUTH: {
                 processAuthCommand(command);
+
                 break;
             }
             case MESSAGE: {
@@ -110,6 +113,7 @@ public class NetworkService {
             String username = data.getUsername();
             if (username != null) {
                 message = username + ": " + message;
+                History.writeLine(username + ": " + message);
             }
             messageHandler.accept(message);
         }
@@ -136,7 +140,9 @@ public class NetworkService {
     public void close() {
         try {
             sendCommand(Command.endCommand());
+            History.stop();
             socket.close();
+
         } catch (IOException e) {
             e.printStackTrace();
         }

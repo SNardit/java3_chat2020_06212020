@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="NetworkClient" />
         <module name="NetworkClientServer" />
+        <module name="Lesson" />
         <module name="NetworkServer" />
       </profile>
     </annotationProcessing>

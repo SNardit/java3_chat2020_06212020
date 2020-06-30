@@ -8,11 +8,7 @@ import server.networkserver.sqlhandler.SQLHandler;
 
 import java.io.*;
 import java.net.Socket;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Scanner;
 
 public class ClientHandler {
 
@@ -36,17 +32,21 @@ public class ClientHandler {
         inputStream = new ObjectInputStream(clientSocket.getInputStream());
         outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
 
-        new Thread(()-> {
-            try {
-                authentication();
-                readMessage();
-            } catch (IOException e) {
-                System.out.println("Connection has been failed!");
-            } finally {
-                closeConnection();
+        serverInstance.serviceExecute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    authentication();
+                    readMessage();
+                } catch (IOException e) {
+                    System.out.println("Connection has been failed!");
+                } finally {
+                    closeConnection();
+                }
             }
-        }).start();
+        });
     }
+
 
     private void closeConnection() {
         try {
@@ -70,7 +70,7 @@ public class ClientHandler {
                     BroadcastMessageCommand data = (BroadcastMessageCommand) command.getData();
                     serverInstance.broadcastMessage(Command.messageCommand(nickname, data.getMessage()));
                     addMessageToDatabase("forAll", data.getMessage());
-                    addMessageToLocalFile("All", data.getMessage());
+                   // addMessageToLocalFile("All", data.getMessage());
                     break;
                 case PRIVATE_MESSAGE:
                     PrivateMessageCommand privateMessageCommand = (PrivateMessageCommand) command.getData();
@@ -78,7 +78,7 @@ public class ClientHandler {
                     String message = privateMessageCommand.getMessage();
                     serverInstance.privateMessage(receiver, Command.messageCommand(nickname, message));
                     addMessageToDatabase(receiver, message);
-                    addMessageToLocalFile(receiver, message);
+                    //addMessageToLocalFile(receiver, message);
                     break;
                 case CHANGE_NICKNAME:
                     ChangeNicknameCommand changeNicknameCommand = (ChangeNicknameCommand) command.getData();
@@ -93,7 +93,7 @@ public class ClientHandler {
         }
     }
 
-    private void addMessageToLocalFile(String receiver, String message) {
+   /* private void addMessageToLocalFile(String receiver, String message) {
         File fileSender = new File(("./NetworkClient/history/history_" + nickname + ".txt"));
         ifFileExist(fileSender);
         addToFile(fileSender, receiver, message);
@@ -126,7 +126,7 @@ public class ClientHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
 
     private Command readCommand() throws IOException {
@@ -232,7 +232,7 @@ public class ClientHandler {
             setNickname(nickname);
             serverInstance.broadcastMessage(Command.messageCommand(null, nickname + " is online!"));
             serverInstance.subscribe(this);
-            serverInstance.privateMessage(nickname, Command.messageCommand(null, SQLHandler.getMessagesForNick(nickname)));
+            //serverInstance.privateMessage(nickname, Command.messageCommand(null, SQLHandler.getMessagesForNick(nickname)));
             return true;
         }
         return false;

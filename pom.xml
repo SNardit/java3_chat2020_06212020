@@ -12,6 +12,7 @@
         <module>NetworkServer</module>
         <module>NetworkClient</module>
         <module>NetworkClientServer</module>
+        <module>Lesson</module>
     </modules>
 
     <properties>

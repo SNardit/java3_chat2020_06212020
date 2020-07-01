@@ -1,7 +1,5 @@
 package lesson5;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.CyclicBarrier;
 
 import static lesson5.Main.*;
 

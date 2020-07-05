@@ -1,7 +1,7 @@
 package client;
 
 
-import client.controller.ClientController;
+import client.controller.*;
 
 import java.io.IOException;
 

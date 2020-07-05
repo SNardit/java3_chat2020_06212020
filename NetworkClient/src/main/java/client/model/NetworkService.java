@@ -3,7 +3,7 @@ package client.model;
 import client.Command;
 import client.command.*;
 import client.controller.AuthEvent;
-import client.controller.ClientController;
+import client.controller.*;
 import client.history.History;
 
 import java.io.IOException;

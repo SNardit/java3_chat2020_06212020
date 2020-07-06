@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MyServer {
 
@@ -20,6 +22,8 @@ public class MyServer {
     private List<ClientHandler> clients;
     private AuthService authService;
     private  ExecutorService service;
+    private static final Logger logger = Logger.getLogger(MyServer.class.getName());
+
 
     public MyServer(int port) {
         this.port = port;
@@ -30,27 +34,32 @@ public class MyServer {
 
     public void start () {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("Server is running");
+            logger.log(Level.INFO, "Server is running");
+            //System.out.println("Server is running");
             if (!SQLHandler.connect()) {
                 throw new RuntimeException("Problems with connecting to the database");
             }
             //authService.start();
             //noinspection InfiniteLoopStatement
             while (true) {
-                System.out.println("Server is waiting connection....");
+                logger.log(Level.INFO, "Server is waiting connection....");
+                //System.out.println("Server is waiting connection....");
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("Client has been connected");
+                logger.log(Level.INFO, "Client has been connected");
+                //System.out.println("Client has been connected");
                 ClientHandler handler = new ClientHandler(clientSocket, this);
                 try {
                     handler.handle();
                 } catch (IOException e) {
-                    System.err.println("Filed to handle client connection!");
+                    logger.log(Level.SEVERE, "Filed to handle client connection!");
+                    //System.err.println("Filed to handle client connection!");
                     clientSocket.close();
                     service.shutdown();
                 }
             }
         } catch (IOException e) {
-            System.err.println(e.getMessage());
+            logger.log(Level.SEVERE, e.getMessage());
+            //System.err.println(e.getMessage());
             e.printStackTrace();
         } finally {
             SQLHandler.disconnect();

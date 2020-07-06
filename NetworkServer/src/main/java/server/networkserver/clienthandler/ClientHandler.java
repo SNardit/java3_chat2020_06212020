@@ -9,6 +9,8 @@ import server.networkserver.sqlhandler.SQLHandler;
 import java.io.*;
 import java.net.Socket;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ClientHandler {
 
@@ -20,6 +22,9 @@ public class ClientHandler {
     private ObjectOutputStream outputStream;
 
     private String nickname;
+
+    private static final Logger logger = Logger.getLogger(ClientHandler.class.getName());
+
 
     public ClientHandler(Socket clientSocket, MyServer myServer) {
         this.clientSocket = clientSocket;
@@ -39,7 +44,8 @@ public class ClientHandler {
                     authentication();
                     readMessage();
                 } catch (IOException e) {
-                    System.out.println("Connection has been failed!");
+                    logger.log(Level.SEVERE, "Connection has been failed!");
+                    //System.out.println("Connection has been failed!");
                 } finally {
                     closeConnection();
                 }
@@ -65,11 +71,13 @@ public class ClientHandler {
             }
             switch (command.getType()) {
                 case END:
+                    logger.log(Level.INFO, "END");
                     return;
                 case BROADCAST_MESSAGE:
                     BroadcastMessageCommand data = (BroadcastMessageCommand) command.getData();
                     serverInstance.broadcastMessage(Command.messageCommand(nickname, data.getMessage()));
                     addMessageToDatabase("forAll", data.getMessage());
+                    logger.log(Level.INFO, nickname +" has sent broadcast_message");
                    // addMessageToLocalFile("All", data.getMessage());
                     break;
                 case PRIVATE_MESSAGE:
@@ -78,16 +86,19 @@ public class ClientHandler {
                     String message = privateMessageCommand.getMessage();
                     serverInstance.privateMessage(receiver, Command.messageCommand(nickname, message));
                     addMessageToDatabase(receiver, message);
+                    logger.log(Level.INFO, nickname +" has sent message to " + receiver);
                     //addMessageToLocalFile(receiver, message);
                     break;
                 case CHANGE_NICKNAME:
                     ChangeNicknameCommand changeNicknameCommand = (ChangeNicknameCommand) command.getData();
                     String newNickname = changeNicknameCommand.getNewNickname();
                     changeNickname(nickname, newNickname);
+                    logger.log(Level.INFO, nickname +" has change nickname to " + newNickname);
                     break;
                 default:
                     String errorMessage = "Unknown type of command: " + command.getType();
-                    System.err.println(errorMessage);
+                    logger.log(Level.SEVERE, errorMessage);
+                    //System.err.println(errorMessage);
                     sendMessage(Command.errorCommand(errorMessage));
             }
         }
@@ -134,7 +145,8 @@ public class ClientHandler {
             return (Command) inputStream.readObject();
         } catch (ClassNotFoundException e) {
             String errorMessage = "Unknown type of object from client!";
-            System.err.println(errorMessage);
+            logger.log(Level.SEVERE, errorMessage);
+            //System.err.println(errorMessage);
             e.printStackTrace();
             sendMessage(Command.errorCommand(errorMessage));
             return null;
@@ -157,6 +169,7 @@ public class ClientHandler {
                     String pass = signUpCommand.getPassword();
                     String nickname = signUpCommand.getUsername();
                     addUserToDatabase(login, pass, nickname);
+                    logger.log(Level.INFO, "New registration: login - "+ login);
                     break;
                 }
                 case AUTH: {
@@ -168,33 +181,22 @@ public class ClientHandler {
                 }
                 default:
                     String errorMessage = "Illegal command for authentication: " + command.getType();
-                    System.err.println(errorMessage);
+                    logger.log(Level.SEVERE, errorMessage);
+                    //System.err.println(errorMessage);
                     sendMessage(Command.errorCommand(errorMessage));
             }
         }
     }
 
-    private void addUserToDatabase(String login, String pass, String nickname) {
+    private void addUserToDatabase(String login, String pass, String nickname) throws IOException {
         if (login.isEmpty() || login.contains(" ") || pass.isEmpty() || pass.contains(" ")) {
-            try {
                 sendMessage(Command.authErrorCommand("Login and/or password can not contain spaces or be empty!"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
         else if (serverInstance.getAuthService().registration(login, pass, nickname)) {
-            try {
                 sendMessage(Command.authErrorCommand("Your have successfully registered! And now you can sign in!"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
         else {
-            try {
                 sendMessage(Command.authErrorCommand("Login \"" + login + "\" already exists. Choose another!"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -206,7 +208,8 @@ public class ClientHandler {
                     clientSocket.close();
                 }
             } catch (InterruptedException e) {
-                System.out.println("Authentication has been successful");
+                logger.log(Level.INFO, "Authentication "+ nickname + " has been successful!");
+                //System.out.println("Authentication has been successful");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -251,30 +254,18 @@ public class ClientHandler {
     }
 
 
-    public void changeNickname(String nickname, String newNickname) {
+    public void changeNickname(String nickname, String newNickname) throws IOException{
         if (newNickname.isEmpty() || newNickname.contains(" ")) {
-            try {
                 serverInstance.privateMessage(nickname, Command.messageCommand(null, "Nickname can not contain spaces or be empty!"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
         else if (serverInstance.getAuthService().changeNickname(nickname, newNickname)) {
-            try {
                 serverInstance.privateMessage(nickname, Command.messageCommand(null, "Your nickname was successfully changed to " + newNickname));
                 setNickname(newNickname);
                 List<String> users = serverInstance.getAllUsername();
                 serverInstance.broadcastMessage(Command.updateUsersListCommand(users));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
         else {
-            try {
-                    serverInstance.privateMessage(nickname, Command.messageCommand(null, "Nickname \"" + newNickname + "\" already exists. Choose another!"));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                serverInstance.privateMessage(nickname, Command.messageCommand(null, "Nickname \"" + newNickname + "\" already exists. Choose another!"));
             }
     }
     public void addMessageToDatabase(String receiver, String message) {

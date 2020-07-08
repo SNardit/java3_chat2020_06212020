@@ -1,6 +1,8 @@
 package server.networkserver.sqlhandler;
 
 import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SQLHandler {
     private static Connection connection;
@@ -11,6 +13,9 @@ public class SQLHandler {
     private static PreparedStatement psAddMessage;
     private static PreparedStatement psGetMessageForNick;
 
+    private static final Logger logger = Logger.getLogger(SQLHandler.class.getName());
+
+
     public static boolean connect() {
         try {
             Class.forName("org.sqlite.JDBC");
@@ -18,9 +23,11 @@ public class SQLHandler {
             prepareAllStatements();
             return true;
         } catch (ClassNotFoundException e) {
+            logger.log(Level.SEVERE, e.getMessage());
             e.printStackTrace();
             return false;
         } catch (SQLException e) {
+            logger.log(Level.SEVERE, e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -35,11 +42,13 @@ public class SQLHandler {
             psAddMessage.close();
             psGetMessageForNick.close();
         } catch (SQLException e) {
+            logger.log(Level.SEVERE, e.getMessage());
             e.printStackTrace();
         }
         try {
             connection.close();
         } catch (SQLException e) {
+            logger.log(Level.SEVERE, e.getMessage());
             e.printStackTrace();
         }
 
@@ -87,6 +96,7 @@ public class SQLHandler {
             }
             rs.close();
         } catch (SQLException e) {
+            logger.log(Level.SEVERE, e.getMessage());
             e.printStackTrace();
         }
 
@@ -124,6 +134,7 @@ public class SQLHandler {
             psAddMessage.executeUpdate();
             return true;
         } catch (SQLException e) {
+            logger.log(Level.SEVERE, e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -151,6 +162,7 @@ public class SQLHandler {
             }
             rs.close();
         } catch (SQLException e) {
+            logger.log(Level.SEVERE, e.getMessage());
             e.printStackTrace();
         }
         return sb.toString();
